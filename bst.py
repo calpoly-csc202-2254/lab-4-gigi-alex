@@ -15,7 +15,7 @@ class Node:
 @dataclass(frozen=True)
 class BinarySearchTree:
     tree : BinTree
-    comes_before : Callable[[Any, Any], bool] 
+    def comes_before : Callable[[Any, Any], bool] 
 
 # Given a binary search tree, return true if the tree is empty, False otherwise 
 def is_empty(bst : BinarySearchTree) -> bool: 
@@ -62,7 +62,7 @@ class Tests(unittest.TestCase):
     def test_insert_2(self): 
         node = Node(element=10, left=None, right=None)
         bst = BinarySearchTree(comes_before=lambda x, y: x < y, tree=node)
-        bst2 = insert(bst, 5) 
+        bst2 = insert(bst, 5)
         self.assertEqual(5, bst2.tree.left.element) 
         self.assertIsNone(bst2.tree.right) 
 
@@ -71,4 +71,3 @@ class Tests(unittest.TestCase):
 if (__name__ == '__main__'):
     unittest.main() 
 
-    
