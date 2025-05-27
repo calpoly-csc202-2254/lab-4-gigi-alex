@@ -35,6 +35,15 @@ def insert(bst : BinarySearchTree, value : Any) -> BinarySearchTree:
     new_tree = insert_helper(bst.tree, value, bst.comes_before) 
     return BinarySearchTree(tree=new_tree, comes_before=bst.comes_before)   
 
+# given a binary search tree and a value, return True of the value is stored in the tree and Fals otherwise 
+def lookup(bst : BinarySearchTree, value : Any) -> bool:  
+    pass 
+
+# given a binary search tree and a value as arguments, removes the value from the tree if present while preserving the binary search tree propertu, that for a given node's value, the values in the left subtree come before, right do not.
+# if the tree happens to have multiple nodes containing the value to be removed, only a single such node will be removed
+def delete(bst : BinarySearchTree, value : Any) -> BinarySearchTree: 
+    pass 
+
 class Tests(unittest.TestCase): 
     #tests for is_empty 
     def test_is_empty_1(self): 
@@ -59,7 +68,7 @@ class Tests(unittest.TestCase):
 
 
 
-
-
 if (__name__ == '__main__'):
     unittest.main() 
+
+    
