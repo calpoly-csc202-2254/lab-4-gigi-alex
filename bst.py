@@ -44,21 +44,25 @@ def insert(bst : BinarySearchTree, value : Any) -> BinarySearchTree:
     new_tree = insert_helper(bst.tree, value, bst.comes_before)
     return BinarySearchTree(tree = new_tree, comes_before = bst.comes_before)   
 
-# given a binary search tree and a value, return True of the value is stored in the tree and False otherwise 
+
+# given a binary search tree and a value, return True if the value is stored in the tree and False otherwise 
 def lookup(bst : BinarySearchTree, value : Any) -> bool:  
-    if bst.tree is None:
+    node = bst.tree 
+    if node is None:
         return False
-    elif bst.comes_before(value, bst.tree.element) == False and bst.comes_before(bst.tree.element, value) == False:
+    elif bst.comes_before(value, node.element) == False and bst.comes_before(node.element, value) == False:
         return True
-    elif bst.comes_before(value, bst.tree.element):
-        return lookup(bst.tree.left, value)
+    elif bst.comes_before(value, node.element):
+        return lookup(BinarySearchTree(node.left, bst.comes_before), value)
     else:
-        lookup(bst.tree.right, value)
+        return lookup(BinarySearchTree(node.right, bst.comes_before), value) 
 
 # given a binary search tree and a value as arguments, removes the value from the tree if present while preserving the binary search tree propertu, that for a given node's value, the values in the left subtree come before, right do not.
 # if the tree happens to have multiple nodes containing the value to be removed, only a single such node will be removed
+
 def delete(bst : BinarySearchTree, value : Any) -> BinarySearchTree: 
     pass 
+
 
 class Tests(unittest.TestCase): 
     #tests for is_empty 
@@ -79,10 +83,35 @@ class Tests(unittest.TestCase):
         node = Node(element=10, left=None, right=None)
         bst = BinarySearchTree(comes_before = int_comes_before, tree = node)
         bst2 = insert(bst, 5)
-        print(bst2)
         self.assertEqual(5, bst2.tree.left.element) 
         self.assertIsNone(bst2.tree.right) 
-
+    def test_insert_3(self): 
+        node = Node(element=20, left=None, right=None)
+        bst = BinarySearchTree(comes_before = int_comes_before, tree = node)
+        bst2 = insert(bst, 22) 
+        self.assertEqual(22, bst2.tree.right.element)
+        self.assertIsNone(bst2.tree.left) 
+    def test_insert_4(self): 
+        node = Node(element='b', right=Node(element='d', left=None, right=None), left=Node(element='a', left=None, right=None)) 
+        bst = BinarySearchTree(comes_before = str_comes_before, tree=node) 
+        bst2 = insert(bst, 'c') 
+        self.assertEqual('d', bst2.tree.right.element) 
+        self.assertEqual('c', bst2.tree.right.left.element) 
+    #tests for lookup 
+    def test_lookup_1(self): 
+        node = Node(element=15, left=Node(element=10, left=None, right=None), right=Node(element=20, left=None, right=None)) 
+        bst = BinarySearchTree(comes_before = int_comes_before, tree = node)    
+        self.assertTrue(lookup(bst, 15)) 
+        self.assertTrue(lookup(bst, 10)) 
+        self.assertTrue(lookup(bst, 20)) 
+        self.assertFalse(lookup(bst, 100)) 
+    def test_lookup_2(self): 
+        node = Node(element='g', left=Node(element='a', left=None, right=None), right=Node(element='z', left=None, right=None)) 
+        bst = BinarySearchTree(comes_before=str_comes_before, tree = node) 
+        self.assertTrue(lookup(bst, 'g')) 
+        self.assertTrue(lookup(bst, 'a')) 
+        self.assertTrue(lookup(bst, 'z'))
+        self.assertFalse(lookup(bst, 'k')) 
 
 
 if (__name__ == '__main__'):
