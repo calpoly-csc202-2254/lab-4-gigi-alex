@@ -32,12 +32,14 @@ def is_empty(bst : BinarySearchTree) -> bool:
 
 # helper function for insert function
 def insert_helper(tree : BinTree, value : Any, comes_before: Callable[[Any, Any], bool]) -> BinTree: 
-    if tree is None: 
-        return Node(value, None, None)
-    elif comes_before(value, tree.element): 
-        return Node(tree.element, insert_helper(tree.left, value, comes_before), tree.right)
-    else: 
-        return Node(tree.element, tree.left, insert_helper(tree.right, value, comes_before))
+    match tree:
+        case None: 
+            return Node(value, None, None)
+        case Node(e, l, r):
+            if comes_before(value, tree.element): 
+                return Node(tree.element, insert_helper(tree.left, value, comes_before), tree.right)
+            else: 
+                return Node(tree.element, tree.left, insert_helper(tree.right, value, comes_before))
 
 # given a binary search tree and a value as arguments, adds the value to the tree by using comes_before function to determine which path to take at each node; left if before, right if after.
 def insert(bst : BinarySearchTree, value : Any) -> BinarySearchTree: 
@@ -47,21 +49,48 @@ def insert(bst : BinarySearchTree, value : Any) -> BinarySearchTree:
 
 # given a binary search tree and a value, return True if the value is stored in the tree and False otherwise 
 def lookup(bst : BinarySearchTree, value : Any) -> bool:  
-    node = bst.tree 
-    if node is None:
+    if bst.tree is None:
         return False
-    elif bst.comes_before(value, node.element) == False and bst.comes_before(node.element, value) == False:
+    elif bst.comes_before(value, bst.tree.element) == False and bst.comes_before(bst.tree.element, value) == False:
         return True
-    elif bst.comes_before(value, node.element):
-        return lookup(BinarySearchTree(node.left, bst.comes_before), value)
+    elif bst.comes_before(value, bst.tree.element):
+        return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), value)
     else:
-        return lookup(BinarySearchTree(node.right, bst.comes_before), value) 
+        return lookup(BinarySearchTree(bst.tree.right, bst.comes_before), value) 
 
 # given a binary search tree and a value as arguments, removes the value from the tree if present while preserving the binary search tree propertu, that for a given node's value, the values in the left subtree come before, right do not.
 # if the tree happens to have multiple nodes containing the value to be removed, only a single such node will be removed
 
+def delete_helper(tree : BinTree, value: Any, comes_before : Callable[[Any, Any], bool]) -> BinTree:
+    match tree:
+            case None:
+                return None
+            case Node(e, l, r):
+                if comes_before(value, e):
+                    return delete_helper(l, value, comes_before)
+                elif comes_before(e, value):
+                    return delete_helper(r, value, comes_before)
+                else:
+                    if l is None:
+                        return r
+                    elif r is None:
+                        return l
+                    else:
+                        current = l
+                        while current is not None and current.right is not None:
+                            current = current.right
+                        new_value = current.element
+                        new_left = delete_helper(l, current.element, comes_before)
+                        return Node(new_value, new_left, r)
+                    
+
 def delete(bst : BinarySearchTree, value : Any) -> BinarySearchTree: 
-    pass 
+    new_tree = delete_helper(bst.tree, value, bst.comes_before)
+    return BinarySearchTree(new_tree, comes_before=bst.comes_before)
+
+test = BinarySearchTree(Node(5, Node(4, None, None), Node(10, None, None)),int_comes_before)
+test_after = delete(test, 5)
+print(test_after)
 
 
 class Tests(unittest.TestCase): 
