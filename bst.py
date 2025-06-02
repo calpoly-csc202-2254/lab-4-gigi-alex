@@ -2,6 +2,8 @@ import sys
 import unittest
 from typing import *
 from dataclasses import dataclass
+import random
+import time
 sys.setrecursionlimit(10**6)
 
 BinTree : TypeAlias = Union["Node", None]
@@ -22,6 +24,9 @@ def int_comes_before(int1 : int, int2 : int) -> bool:
 
 def str_comes_before(str1 : str, str2 : str) -> bool:
     return str1 < str2
+
+def float_comes_before(float1 : float, float2 : float) -> bool:
+    return float1 < float2
 
 ex1 = BinarySearchTree(Node(10,Node(5,None,None),None),int_comes_before)
 ex2 = BinarySearchTree(Node("a",None,None),str_comes_before)
@@ -67,9 +72,9 @@ def delete_helper(tree : BinTree, value: Any, comes_before : Callable[[Any, Any]
                 return None
             case Node(e, l, r):
                 if comes_before(value, e):
-                    return delete_helper(l, value, comes_before)
+                    return Node(e, delete_helper(l, value, comes_before), r)
                 elif comes_before(e, value):
-                    return delete_helper(r, value, comes_before)
+                    return Node(e, l, delete_helper(r, value, comes_before))
                 else:
                     if l is None:
                         return r
@@ -88,10 +93,43 @@ def delete(bst : BinarySearchTree, value : Any) -> BinarySearchTree:
     new_tree = delete_helper(bst.tree, value, bst.comes_before)
     return BinarySearchTree(new_tree, comes_before=bst.comes_before)
 
-test = BinarySearchTree(Node(5, Node(4, None, None), Node(10, None, None)),int_comes_before)
-test_after = delete(test, 5)
-print(test_after)
+def performance_test():
+    sizes = [100_000 * i for i in range(1, 11)]  # 100K to 1M
+    insert_times = []
+    search_times = []
 
+    bst = BinarySearchTree(None, float_comes_before)
+    inserted_values = []
+
+    print(f"{'Tree Size':>10} | {'Insert Time (s)':>15} | {'Search Time (s)':>15}")
+    print("-" * 45)
+
+    for size in sizes:
+        num_new_values = size - len(inserted_values)
+        new_values = [random.random() for _ in range(num_new_values)]
+
+        # Time insertions
+        start_insert = time.time()
+        for val in new_values:
+            bst = insert(bst, val)
+        insert_time = time.time() - start_insert
+        insert_times.append(insert_time)
+
+        inserted_values.extend(new_values)
+
+        # Time 1000 searches (very unlikely to be in the tree)
+        search_queries = [random.random() for _ in range(1000)]
+
+        start_search = time.time()
+        for q in search_queries:
+            lookup(bst, q)
+        search_time = time.time() - start_search
+        search_times.append(search_time)
+
+        print(f"{size:10} | {insert_time:15.4f} | {search_time:15.4f}")
+
+if __name__ == "__main__":
+    performance_test()
 
 class Tests(unittest.TestCase): 
     #tests for is_empty 
