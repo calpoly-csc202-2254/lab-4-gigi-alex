@@ -179,7 +179,12 @@ class Tests(unittest.TestCase):
         self.assertTrue(lookup(bst, 'a')) 
         self.assertTrue(lookup(bst, 'z'))
         self.assertFalse(lookup(bst, 'k')) 
-
+    def test_delete_1(self):
+        node = Node(element = 10, left=Node(element=5, left=None, right=None), right=Node(element=25, left=None, right=Node(element=35, left=None, right=None)))
+        bst = BinarySearchTree(comes_before=int_comes_before, tree=node)
+        bst2 = delete(bst, 25)
+        print(bst2)
+        self.assertEqual(35, bst2.tree.right.element)
 
 if (__name__ == '__main__'):
     unittest.main() 
